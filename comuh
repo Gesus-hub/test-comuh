@@ -1,0 +1,158 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+APP_SERVICE="${APP_SERVICE:-web}"
+
+die() {
+  echo "Erro: $*" >&2
+  exit 1
+}
+
+check_docker() {
+  command -v docker >/dev/null 2>&1 || die "docker não encontrado no PATH."
+  docker compose version >/dev/null 2>&1 || die "docker compose não está disponível."
+}
+
+service_running() {
+  local status
+  status="$(docker compose ps --status running --services 2>/dev/null || true)"
+  echo "$status" | grep -qx "$APP_SERVICE"
+}
+
+require_running_service() {
+  if ! service_running; then
+    die "Serviço '$APP_SERVICE' não está em execução. Rode: ./comuh up -d"
+  fi
+}
+
+exec_in_web() {
+  require_running_service
+  docker compose exec "$APP_SERVICE" "$@"
+}
+
+exec_in_web_test() {
+  require_running_service
+  docker compose exec -e RAILS_ENV=test "$APP_SERVICE" "$@"
+}
+
+help() {
+  cat <<'EOF'
+Uso: ./comuh <comando> [args]
+
+Comandos principais:
+  up [args]            # docker compose up [args]
+  down [args]          # docker compose down [args]
+  stop [args]          # docker compose stop [args]
+  restart              # docker compose restart
+  logs [args]          # docker compose logs -f [args]
+  build [args]         # docker compose build [args]
+
+Atalhos app:
+  sh                   # abre shell no container web
+  console              # rails console
+  run <cmd...>         # roda comando no container web
+  db:prepare           # rails db:prepare (prod e test)
+  db:migrate           # rails db:migrate (prod e test)
+  db:seed              # seed do projeto (via HTTP)
+  rspec [args]         # bundle exec rspec (RAILS_ENV=test)
+  rubocop [args]       # bundle exec rubocop
+  rubocop:fix [args]   # bundle exec rubocop -A
+  seed:http [args]     # bundle exec rake seed:http
+
+Exemplos:
+  ./comuh up -d
+  ./comuh db:migrate
+  ./comuh rspec spec/models
+  ./comuh rubocop app/controllers
+EOF
+}
+
+main() {
+  local cmd="${1:-help}"
+
+  case "$cmd" in
+    help|-h|--help)
+      help
+      exit 0
+      ;;
+  esac
+
+  check_docker
+
+  case "$cmd" in
+    up)
+      shift
+      docker compose up "$@"
+      ;;
+    down)
+      shift
+      docker compose down "$@"
+      ;;
+    stop)
+      shift
+      docker compose stop "$@"
+      ;;
+    restart)
+      docker compose restart
+      ;;
+    logs)
+      shift
+      docker compose logs -f "$@"
+      ;;
+    build)
+      shift
+      docker compose build "$@"
+      ;;
+    sh)
+      exec_in_web bash
+      ;;
+    console)
+      exec_in_web bundle exec rails console
+      ;;
+    run)
+      shift
+      [ "$#" -gt 0 ] || die "Use: ./comuh run <comando...>"
+      exec_in_web "$@"
+      ;;
+    db:prepare)
+      echo "Preparando banco (ambiente padrão)..."
+      exec_in_web bundle exec rails db:prepare
+      echo "Preparando banco (test)..."
+      exec_in_web_test bundle exec rails db:prepare
+      ;;
+    db:migrate)
+      echo "Migrando banco (ambiente padrão)..."
+      exec_in_web bundle exec rails db:migrate
+      echo "Migrando banco (test)..."
+      exec_in_web_test bundle exec rails db:migrate
+      ;;
+    db:seed)
+      shift
+      exec_in_web bundle exec rake seed:http "$@"
+      ;;
+    rspec)
+      shift
+      exec_in_web_test bundle exec rspec "$@"
+      ;;
+    rubocop)
+      shift
+      exec_in_web bundle exec rubocop "$@"
+      ;;
+    rubocop:fix)
+      shift
+      exec_in_web bundle exec rubocop -A "$@"
+      ;;
+    seed:http)
+      shift
+      exec_in_web bundle exec rake seed:http "$@"
+      ;;
+    *)
+      echo "Comando inválido: $cmd"
+      echo
+      help
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"

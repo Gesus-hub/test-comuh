@@ -1,0 +1,23 @@
+- sentiment_label, sentiment_class = sentiment_badge(comment.ai_sentiment_score)
+- counts = reaction_counts_for(comment)
+- left_margin = [level * 18, 72].min
+
+.card.border-start.border-3.shadow-sm{id: dom_id(comment), style: "margin-left: #{left_margin}px;"}
+  .card-body
+    .d-flex.justify-content-between.align-items-start.gap-2
+      .d-flex.flex-column
+        %strong= comment.user.username
+        %small.text-secondary= l(comment.created_at, format: :short)
+      %span.badge{class: sentiment_class}= sentiment_label
+
+    .mt-2= simple_format(comment.content)
+
+    .d-flex.align-items-center.flex-wrap.gap-2.mt-3{data: {controller: "reaction", reaction_message_id_value: comment.id}}
+      - Reaction::REACTION_TYPES.each do |reaction_type|
+        %button.btn.btn-sm.btn-outline-secondary{type: "button", data: {action: "reaction#react", reaction_type: reaction_type}}
+          = reaction_type
+          %span.badge.text-bg-light.ms-1{data: {count_for: reaction_type}}= counts[reaction_type]
+      %small.text-secondary{data: {reaction_target: "feedback"}}
+
+- comment.replies.order(created_at: :asc).each do |reply|
+  = render "messages/comment", comment: reply, level: level + 1

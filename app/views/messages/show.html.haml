@@ -1,0 +1,30 @@
+- content_for :title, "Thread ##{@message.id}"
+
+.d-flex.justify-content-between.align-items-start.mb-3
+  %h1.h4.mb-0 Thread da mensagem
+  = link_to "Voltar para comunidade", community_path(@message.community), class: "btn btn-outline-secondary btn-sm"
+
+.mb-4
+  = render "messages/message", message: @message
+
+.row.g-4
+  .col-12.col-lg-4
+    .card.shadow-sm
+      .card-header Novo comentário
+      .card-body
+        %form{ data: { controller: "message-form", action: "submit->message-form#submit", message_form_list_id_value: "comments-list" } }
+          .mb-3
+            %label.form-label{ for: "new_comment_username" } Username
+            %input#new_comment_username.form-control{ name: "username", type: "text", required: true, data: { message_form_target: "username", current_username: true } }
+          .mb-3
+            %label.form-label{ for: "new_comment_content" } Comentário
+            %textarea#new_comment_content.form-control{ name: "content", rows: 4, required: true, data: { message_form_target: "content" } }
+          %input{ type: "hidden", name: "community_id", value: @message.community_id }
+          %input{ type: "hidden", name: "parent_message_id", value: @message.id }
+          %button.btn.btn-primary.w-100{ type: "submit", data: { message_form_target: "submit" } } Publicar comentário
+          .small.mt-2.text-secondary{ data: { message_form_target: "feedback" } }
+  .col-12.col-lg-8
+    %h2.h5.mb-3 Comentários
+    #comments-list.d-flex.flex-column.gap-3
+      - @message.replies.order(created_at: :asc).each do |comment|
+        = render "messages/comment", comment: comment, level: 1

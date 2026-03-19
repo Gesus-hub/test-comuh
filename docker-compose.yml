@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: test_comuh_production
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d test_comuh_production" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/rails
+    environment:
+      RAILS_ENV: production
+      SECRET_KEY_BASE: dummy_secret_key_base_for_docker
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_NAME_PRODUCTION: test_comuh_production
+
+volumes:
+  postgres_data:

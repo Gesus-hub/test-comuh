@@ -1,0 +1,10 @@
+- messages_count = local_assigns.fetch(:messages_count, community.attributes["messages_count"]).to_i
+
+.col-12.col-md-6.col-lg-4
+  .card.h-100.shadow-sm
+    .card-body.d-flex.flex-column
+      %h2.h5.card-title= community.name
+      %p.card-text.text-secondary.flex-grow-1= community.description.presence || "Sem descrição"
+      .d-flex.justify-content-between.align-items-center.mt-3
+        %span.badge.text-bg-primary= "#{messages_count} mensagens"
+        = link_to "Acessar", community_path(community), class: "btn btn-sm btn-outline-primary"

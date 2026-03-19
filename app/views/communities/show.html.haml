@@ -1,0 +1,28 @@
+- content_for :title, @community.name
+
+.d-flex.justify-content-between.align-items-start.flex-wrap.gap-2.mb-4
+  .d-flex.flex-column
+    %h1.h3.mb-1= @community.name
+    %p.text-secondary.mb-0= @community.description
+  = link_to "Voltar", communities_path, class: "btn btn-outline-secondary btn-sm"
+
+.row.g-4
+  .col-12.col-lg-4
+    .card.shadow-sm
+      .card-header Nova mensagem
+      .card-body
+        %form{ data: { controller: "message-form", action: "submit->message-form#submit", message_form_list_id_value: "messages-list" } }
+          .mb-3
+            %label.form-label{ for: "new_message_username" } Username
+            %input#new_message_username.form-control{ name: "username", type: "text", required: true, data: { message_form_target: "username", current_username: true } }
+          .mb-3
+            %label.form-label{ for: "new_message_content" } Conteúdo
+            %textarea#new_message_content.form-control{ name: "content", rows: 4, required: true, data: { message_form_target: "content" } }
+          %input{ type: "hidden", name: "community_id", value: @community.id }
+          %button.btn.btn-primary.w-100{ type: "submit", data: { message_form_target: "submit" } } Enviar
+          .small.mt-2.text-secondary{ data: { message_form_target: "feedback" } }
+  .col-12.col-lg-8
+    %h2.h5.mb-3 Timeline (últimas 50)
+    #messages-list.d-flex.flex-column.gap-3
+      - @messages.each do |message|
+        = render "messages/message", message: message

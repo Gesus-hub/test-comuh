@@ -6,9 +6,9 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: test_comuh_production
+      POSTGRES_DB: test_comuh_development
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d test_comuh_production" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d test_comuh_development" ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -25,12 +25,14 @@ services:
     volumes:
       - .:/rails
     environment:
-      RAILS_ENV: production
+      RAILS_ENV: development
       SECRET_KEY_BASE: dummy_secret_key_base_for_docker
       DB_HOST: db
       DB_PORT: 5432
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+      DB_NAME_DEVELOPMENT: test_comuh_development
+      DB_NAME_TEST: test_comuh_test
       DB_NAME_PRODUCTION: test_comuh_production
 
 volumes:

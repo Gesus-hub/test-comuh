@@ -100,7 +100,6 @@ TOTAL_MESSAGES.times do |index|
         }
       )
     rescue StandardError
-      # Duplicate reactions are expected occasionally because users are random.
     end
   end
 

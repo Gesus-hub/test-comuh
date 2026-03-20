@@ -1,8 +1,10 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
+set -e
 
-# If running any Rails command, ensure database exists and is migrated.
-if [ "$1" = "./bin/rails" ] || [ "$1" = "bin/rails" ] || [ "$1" = "rails" ]; then
+if [ "${RAILS_ENV:-development}" = "production" ]; then
+  ./bin/rails db:prepare
+elif [ "$1" = "./bin/rails" ] || [ "$1" = "bin/rails" ] || [ "$1" = "rails" ]; then
   ./bin/rails db:prepare
 fi
 
-exec "${@}"
+exec "$@"

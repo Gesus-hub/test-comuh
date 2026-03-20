@@ -5,7 +5,8 @@ require "json"
 require "faraday"
 require "set"
 
-BASE_URL = ENV.fetch("SEED_BASE_URL", "http://localhost:3000")
+DEFAULT_SEED_PORT = ENV.fetch("PORT", "3000")
+BASE_URL = ENV.fetch("SEED_BASE_URL", "http://localhost:#{DEFAULT_SEED_PORT}")
 TOTAL_MESSAGES = 1000
 REACTION_TYPES = %w[like love insightful].freeze
 MAIN_POST_RATIO = 0.7

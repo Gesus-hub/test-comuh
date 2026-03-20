@@ -49,7 +49,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_013736) do
     t.index ["message_id", "user_id", "reaction_type"], name: "index_reactions_unique_per_user_type", unique: true
     t.index ["message_id"], name: "index_reactions_on_message_id"
     t.index ["user_id"], name: "index_reactions_on_user_id"
-    t.check_constraint "reaction_type::text = ANY (ARRAY['like'::character varying, 'love'::character varying, 'insightful'::character varying]::text[])", name: "reactions_type_allowed"
+    t.check_constraint "reaction_type::text = ANY (ARRAY['like'::character varying::text, 'love'::character varying::text, 'insightful'::character varying::text])", name: "reactions_type_allowed"
   end
 
   create_table "users", force: :cascade do |t|

@@ -88,11 +88,13 @@ Abra: `http://localhost:3000/communities`
 
 O script gera:
 
-- 3-5 comunidades
+- 3-5 comunidades (`SEED_COMMUNITIES`, default: 5)
 - 50 usuários
-- 1000 mensagens (70% posts, 30% comentários)
-- 20 IPs
-- reações em ~80% das mensagens
+- 1000 mensagens com distribuição exata:
+  - 700 posts principais
+  - 300 comentários/respostas
+- 20 IPs únicos garantidos
+- 800 mensagens com reação (80% exato)
 
 Com app rodando:
 

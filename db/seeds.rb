@@ -1,8 +1,9 @@
-seed_url = ENV.fetch("SEED_BASE_URL", "http://localhost:3000")
+default_seed_url = "http://localhost:#{ENV.fetch("PORT", "3000")}"
+seed_url = ENV.fetch("SEED_BASE_URL", default_seed_url)
 ci_enabled = ENV.fetch("CI", "false") == "true"
 skip_http_seed_flag = ENV.fetch("SKIP_HTTP_SEED", "false") == "true"
 force_http_seed_flag = ENV.fetch("FORCE_HTTP_SEED", "false") == "true"
-skip_http_seed = !force_http_seed_flag && (Rails.env.test? || ci_enabled || skip_http_seed_flag)
+skip_http_seed = !force_http_seed_flag && (Rails.env.test? || Rails.env.production? || ci_enabled || skip_http_seed_flag)
 
 if skip_http_seed
   puts(
@@ -10,6 +11,9 @@ if skip_http_seed
     "(RAILS_ENV=#{Rails.env}, CI=#{ci_enabled}, " \
     "SKIP_HTTP_SEED=#{skip_http_seed_flag}, FORCE_HTTP_SEED=#{force_http_seed_flag})."
   )
+  if Rails.env.production? && !force_http_seed_flag
+    puts "Para executar em produção, use FORCE_HTTP_SEED=true e configure SEED_BASE_URL."
+  end
 else
   puts "Executando seed HTTP em #{seed_url}"
 

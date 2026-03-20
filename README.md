@@ -2,6 +2,8 @@
 
 Aplicação Rails 8.1 com API REST + interface web (HAML + Stimulus + Turbo) para gestão de comunidades, mensagens, comentários, reações e analytics de IP suspeito.
 
+URL de teste (Render): https://test-comuh.onrender.com/communities
+
 ## Stack
 
 - Ruby `3.4.7`
@@ -196,7 +198,7 @@ Também aceita `username` no lugar de `user_id` para a interface web.
 
 ### Deploy
 
-- [ ] URL da aplicação: [URL]
+- [x] URL da aplicação: https://test-comuh.onrender.com/communities
 - [x] Docker funcionando
 - [ ] Seeds executados (dados visíveis em ambiente publicado)
 

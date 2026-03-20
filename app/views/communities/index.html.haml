@@ -1,0 +1,34 @@
+- content_for :title, "Comunidades"
+
+.d-flex.justify-content-between.align-items-center.mb-4
+  .d-flex.flex-column
+    %h1.h3.mb-1 Comunidades
+    %p.text-secondary.mb-0 Plataforma de gestão de comunidades com API e IA de sentimento.
+
+.row.g-4.mb-4
+  .col-12.col-lg-5
+    .card.shadow-sm
+      .card-header Criar comunidade
+      .card-body
+        %form{ data: { controller: "community-form", action: "submit->community-form#submit", community_form_list_id_value: "communities-list", community_form_empty_state_id_value: "communities-empty" } }
+          .mb-3
+            %label.form-label{ for: "new_community_name" } Nome
+            %input#new_community_name.form-control{ name: "name", type: "text", required: true, data: { community_form_target: "name" } }
+          .mb-3
+            %label.form-label{ for: "new_community_description" } Descrição
+            %textarea#new_community_description.form-control{ name: "description", rows: 3, data: { community_form_target: "description" } }
+          %button.btn.btn-primary.w-100{ type: "submit", data: { community_form_target: "submit" } } Criar comunidade
+          .small.mt-2.text-secondary{ data: { community_form_target: "feedback" } }
+  .col-12.col-lg-7
+    .alert.alert-light.border.mb-0
+      .fw-semibold.mb-1 Fluxo recomendado
+      %div 1) Crie uma comunidade aqui.
+      %div 2) Clique em "Acessar" para publicar mensagens e reagir sem reload.
+      %div 3) Para dados de volume, rode: `./comuh db:seed`.
+
+- if @communities.empty?
+  #communities-empty.alert.alert-info Sem comunidades ainda. Crie a primeira para começar.
+
+#communities-list.row.g-3
+  - @communities.each do |community|
+    = render "community_card", community: community
